@@ -1,0 +1,25 @@
+service: portfolio-backend
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: ap-south-1
+  environment:
+    TOKEN: portfolio-backend-by-Rishit-Shivesh
+    CASSANDRA_USERNAME: vZTDAqWkfnJZXFjwtwsnsWmP
+    CASSANDRA_PASSWORD: Rza,GK973fR3eo.xPaJq5vsbmax5hSPGaBH8Znf6tFeFd5jy.gsYp_xIZNkb.-g1xj.pnsxflaQ934S-zRAPHHKKztdzbKhbjumbv_WFaDJkTwlblCT8xld3uvtZpElZ
+    CASSANDRA_HOST: cassandra
+    AWS_REGIONS: ap-south-1
+
+functions:
+  app:
+    handler: index.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
