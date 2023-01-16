@@ -38,10 +38,12 @@ app.get("/", (req, res) => {
 app.get("/connect", async (req, res) => {
   res.send("Connected to Cassandra");
 });
+
 app.listen(4000, () => {
   connectDB();
   console.log("DB Connected");
   console.log("Example app listening on port 4000!");
 });
 
-module.exports.handler = serverless(app);
+module.exports = app;
+// module.exports.handler = serverless(app);
