@@ -1,13 +1,20 @@
 const Router = require("express").Router;
 const router = Router();
 const uuid = require("uuid");
-const db = require("../db/index").dbClient;
+// const db = require("../db/index").dbClient;
+const db = require("../utils/Dynamo");
 const { isAuthenticated } = require("../middlewares/auth.middleware");
+const TableName = process.env.TABLE_NAME;
+const UserName = process.env.USER_NAME;
+require("dotenv").config();
+
 router.get("/", isAuthenticated, async (req, res) => {
-  const query = "SELECT * FROM cassandra.music";
   try {
-    const songs = await db.execute(query, [], { prepare: true });
-    res.json({ data: songs.rows, status: 200 });
+    // const query = "SELECT * FROM cassandra.music";
+    // const songs = await db.execute(query, [], { prepare: true });
+    // console.log(db);
+    const songs = await db.queryBeginsWith(UserName, "songs", TableName);
+    res.json({ data: songs, status: 200 });
   } catch (err) {
     res.json({ data: err, status: 500 });
   }
@@ -16,25 +23,26 @@ router.get("/", isAuthenticated, async (req, res) => {
 
 router.post("/", isAuthenticated, async (req, res) => {
   const { name, artist, album, year, src, album_art, art } = req.body;
-  console.log(req.body.year);
+  // console.log(req.body.year);
+  if (!name || !artist || !album || !year || !src || !album_art || !art) {
+    return res.json({ data: "Please fill all the fields", status: 422 });
+  }
   const id = uuid.v4();
   const created = new Date().toISOString();
-  const query =
-    "INSERT INTO cassandra.music (id, name, artist, album, year, src, album_art, art, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
+  // const check_if_exists
+  // const query =
+  //   "INSERT INTO cassandra.music (id, name, artist, album, year, src, album_art, art, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
   try {
-    const song = await db.execute(query, [
+    const song = {
+      pk: UserName,
+      sk: `songs#${id}`,
       id,
-      name,
-      artist,
-      album,
-      year,
-      src,
-      album_art,
-      art,
+      ...req.body,
       created,
-    ]);
-    console.log(song);
-    res.json({ data: song, status: 200 });
+    };
+    const data = await db.put(song, TableName);
+    // console.log(song);
+    res.json({ data: data, status: 200 });
   } catch (err) {
     res.json({ data: err, status: 500 });
   }
@@ -43,30 +51,30 @@ router.post("/", isAuthenticated, async (req, res) => {
 router.post("/batchAdd", isAuthenticated, async (req, res) => {
   const data = req.body;
 
-  // batch add songs
+  // // batch add songs
 
-  const query =
-    "INSERT INTO cassandra.music (id, name, artist, album, year, src, album_art, art, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
-  //   const params = [];
+  // const query =
+  //   "INSERT INTO cassandra.music (id, name, artist, album, year, src, album_art, art, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
+  // //   const params = [];
   const queries = [];
   data.forEach((song) => {
     const id = uuid.v4();
     const created = new Date().toISOString();
-    const params = [
+    const s = {
+      pk: UserName,
+      sk: `songs#${id}`,
       id,
-      song.name,
-      song.artist,
-      song.album,
-      song.year,
-      song.src,
-      song.album_art,
-      song.art,
+      ...song,
       created,
-    ];
-    queries.push({ query, params });
+    };
+    queries.push(s);
   });
   try {
-    const songs = await db.batch(queries);
+    // const songs = await db.batch(queries);
+    queries.forEach(async (song) => {
+      await db.put(song, TableName);
+    });
+    const songs = queries;
     res.json({ data: songs, status: 200 });
   } catch (err) {
     res.json({ data: err, status: 500 });

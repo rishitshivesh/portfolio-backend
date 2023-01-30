@@ -6,7 +6,7 @@ const cors = require("cors");
 const uuid = require("uuid");
 const bcrypt = require("bcryptjs");
 const { check, validationResult } = require("express-validator");
-const { connectDB, db } = require("./db");
+// const { connectDB, db } = require("./db");
 const songRoutes = require("./routes/songs.routes");
 const notificationRoutes = require("./routes/notifications.routes");
 const { hash, verifyHash } = require("./utils/index");
@@ -40,7 +40,7 @@ app.get("/connect", async (req, res) => {
 });
 
 app.listen(4000, () => {
-  connectDB();
+  // connectDB();
   console.log("DB Connected");
   console.log("Example app listening on port 4000!");
 });

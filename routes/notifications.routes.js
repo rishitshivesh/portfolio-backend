@@ -1,7 +1,7 @@
 const Router = require("express").Router;
 const router = Router();
 const uuid = require("uuid");
-const db = require("../db/index").dbClient;
+// const db = require("../db/index").dbClient;
 const { isAuthenticated } = require("../middlewares/auth.middleware");
 router.get("/", isAuthenticated, async (req, res) => {
   const query = "SELECT * FROM cassandra.notifications";
