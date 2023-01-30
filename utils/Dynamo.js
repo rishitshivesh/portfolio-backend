@@ -1,7 +1,12 @@
 const AWS = require("aws-sdk");
 AWS.config.update({ region: "ap-south-1" });
 require("dotenv").config();
-const docClient = new AWS.DynamoDB.DocumentClient();
+const docClient = new AWS.DynamoDB.DocumentClient({
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_KEY,
+  },
+});
 
 const DB = {
   async get(pk, sk, TableName) {
