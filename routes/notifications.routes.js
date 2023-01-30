@@ -2,35 +2,44 @@ const Router = require("express").Router;
 const router = Router();
 const uuid = require("uuid");
 // const db = require("../db/index").dbClient;
+const db = require("../utils/Dynamo");
 const { isAuthenticated } = require("../middlewares/auth.middleware");
+const TableName = process.env.TABLE_NAME;
+const UserName = process.env.USER_NAME;
+require("dotenv").config();
+
 router.get("/", isAuthenticated, async (req, res) => {
-  const query = "SELECT * FROM cassandra.notifications";
   try {
-    const songs = await db.execute(query, [], { prepare: true });
-    res.json({ data: songs.rows, status: 200 });
+    const songs = await db.queryBeginsWith(
+      UserName,
+      "notifications",
+      TableName
+    );
+    res.json({ data: songs, status: 200 });
   } catch (err) {
     res.json({ data: err, status: 500 });
   }
   //   res.send("Hello World! Songs are here");
 });
-
 router.post("/", isAuthenticated, async (req, res) => {
   const { msg, person, img } = req.body;
-  console.log(req.body.msg);
+  // console.log(req.body.msg);
+  if (!msg || !person || !img) {
+    return res.json({ data: "Please fill all the fields", status: 422 });
+  }
   const id = uuid.v4();
   const created = new Date().toISOString();
-  const query =
-    "INSERT INTO cassandra.notifications (id, msg, person, img, created) VALUES (?, ?, ?, ?, ?)";
   try {
-    const notification = await db.execute(query, [
+    const notification = {
+      pk: UserName,
+      sk: `notifications#${id}`,
       id,
-      msg,
-      person,
-      img,
+      ...req.body,
       created,
-    ]);
-    console.log(song);
-    res.json({ data: notification, status: 200 });
+    };
+    const data = await db.put(notification, TableName);
+    // console.log(song);
+    res.json({ data: data, status: 200 });
   } catch (err) {
     res.json({ data: err, status: 500 });
   }
@@ -39,27 +48,27 @@ router.post("/", isAuthenticated, async (req, res) => {
 router.post("/batchAdd", isAuthenticated, async (req, res) => {
   const data = req.body;
 
-  // batch add notifications
-
-  const query =
-    "INSERT INTO cassandra.notifications (id, msg, person, img) VALUES (?, ?, ?, ?)";
-
   const queries = [];
   data.forEach((notification) => {
     const id = uuid.v4();
+    const created = new Date().toISOString();
+
     // const created = new Date().toISOString();
-    const params = [
+    const n = {
+      pk: UserName,
+      sk: `notifications#${id}`,
       id,
-      notification.msg,
-      notification.person,
-      notification.img,
-      //   created,
-    ];
-    queries.push({ query, params });
+      ...notification,
+      created,
+    };
+    queries.push(n);
   });
   try {
-    const notifications = await db.batch(queries, { prepare: true });
-    res.json({ data: notifications, status: 200 });
+    queries.forEach(async (notification) => {
+      await db.put(notification, TableName);
+    });
+
+    res.json({ data: queries, status: 200 });
   } catch (err) {
     res.json({ data: err, status: 500 });
   }

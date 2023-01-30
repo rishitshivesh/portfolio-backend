@@ -10,9 +10,6 @@ require("dotenv").config();
 
 router.get("/", isAuthenticated, async (req, res) => {
   try {
-    // const query = "SELECT * FROM cassandra.music";
-    // const songs = await db.execute(query, [], { prepare: true });
-    // console.log(db);
     const songs = await db.queryBeginsWith(UserName, "songs", TableName);
     res.json({ data: songs, status: 200 });
   } catch (err) {
