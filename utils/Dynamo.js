@@ -105,6 +105,22 @@ const DB = {
       }
     });
   },
+  // write async batch put function
+  async batchWrite(data, TableName) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const params = {
+          RequestItems: {
+            [TableName]: data,
+          },
+        };
+        const res = await docClient.batchWrite(params).promise();
+        resolve(data);
+      } catch (error) {
+        reject({ message: "There was an error while adding data", error });
+      }
+    });
+  },
   async delete(pk, sk, TableName) {
     return new Promise(async (resolve, reject) => {
       try {

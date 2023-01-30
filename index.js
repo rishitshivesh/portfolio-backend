@@ -9,6 +9,7 @@ const { check, validationResult } = require("express-validator");
 // const { connectDB, db } = require("./db");
 const songRoutes = require("./routes/songs.routes");
 const notificationRoutes = require("./routes/notifications.routes");
+const staticRoutes = require("./routes/static.routes");
 const { hash, verifyHash } = require("./utils/index");
 // const cors = require("cors");
 // const serverless = require("serverless-http");
@@ -19,6 +20,7 @@ app.use(cors());
 require("dotenv").config();
 app.use(express.json());
 
+app.use("/api/v1", staticRoutes);
 app.use("/api/v1/songs", songRoutes.router);
 app.use("/api/v1/notifications", notificationRoutes.router);
 
