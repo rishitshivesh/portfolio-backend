@@ -18,6 +18,16 @@ router.get("/", isAuthenticated, async (req, res) => {
   //   res.send("Hello World! blogs are here");
 });
 
+router.get("/:id", isAuthenticated, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const blog = await db.get(UserName, `blogs#${id}`, TableName);
+    res.json({ data: blog, status: 200 });
+  } catch (err) {
+    res.json({ data: err, status: 500 });
+  }
+});
+
 router.post("/", isAuthenticated, async (req, res) => {
   const { title, date, author, body, raw } = req.body;
   // console.log(req.body.year);
