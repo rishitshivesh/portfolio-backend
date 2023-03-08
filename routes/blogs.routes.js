@@ -43,8 +43,8 @@ router.post("/", isAuthenticated, async (req, res) => {
     const blog = {
       pk: UserName,
       sk: `blogs#${id}`,
-      id,
       ...req.body,
+      id,
       created,
     };
     const data = await db.put(blog, TableName);
@@ -70,8 +70,8 @@ router.post("/batchAdd", isAuthenticated, async (req, res) => {
     const s = {
       pk: UserName,
       sk: `blogs#${id}`,
-      id,
       ...blog,
+      id,
       created,
     };
     queries.push(s);
