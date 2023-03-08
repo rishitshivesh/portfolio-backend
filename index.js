@@ -10,6 +10,7 @@ const { check, validationResult } = require("express-validator");
 const songRoutes = require("./routes/songs.routes");
 const notificationRoutes = require("./routes/notifications.routes");
 const staticRoutes = require("./routes/static.routes");
+const blogRoutes = require("./routes/blogs.routes");
 const { hash, verifyHash } = require("./utils/index");
 // const cors = require("cors");
 // const serverless = require("serverless-http");
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use("/api/v1", staticRoutes);
 app.use("/api/v1/songs", songRoutes.router);
 app.use("/api/v1/notifications", notificationRoutes.router);
+app.use("/api/v1/blogs", blogRoutes.router);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
