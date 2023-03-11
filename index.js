@@ -28,8 +28,8 @@ app.use("/api/v1/songs", songRoutes.router);
 app.use("/api/v1/notifications", notificationRoutes.router);
 app.use("/api/v1/blogs", blogRoutes.router);
 
-app.use("/api/v1/ayush", staticRoutes);
-app.use("/api/v1/ayush/blogs", blogRoutes.router);
+app.use("/api/v1/ayush", staticAyushRoutes);
+app.use("/api/v1/ayush/blogs", blogAyushRoutes.router);
 app.use("/api/v1/ayush/songs", songRoutes.router);
 app.use("/api/v1/ayush/notifications", notificationRoutes.router);
 
