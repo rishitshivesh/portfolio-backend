@@ -11,6 +11,8 @@ const songRoutes = require("./routes/songs.routes");
 const notificationRoutes = require("./routes/notifications.routes");
 const staticRoutes = require("./routes/static.routes");
 const blogRoutes = require("./routes/blogs.routes");
+const staticAyushRoutes = require("./routes-ayush/static.routes");
+const blogAyushRoutes = require("./routes-ayush/blogs.routes");
 const { hash, verifyHash } = require("./utils/index");
 // const cors = require("cors");
 // const serverless = require("serverless-http");
@@ -22,6 +24,9 @@ require("dotenv").config();
 app.use(express.json());
 
 app.use("/api/v1", staticRoutes);
+app.use("/api/v1/ayush", staticRoutes);
+app.use("/api/v1/ayush/blogs", blogRoutes.router);
+
 app.use("/api/v1/songs", songRoutes.router);
 app.use("/api/v1/notifications", notificationRoutes.router);
 app.use("/api/v1/blogs", blogRoutes.router);
