@@ -24,12 +24,14 @@ require("dotenv").config();
 app.use(express.json());
 
 app.use("/api/v1", staticRoutes);
-app.use("/api/v1/ayush", staticRoutes);
-app.use("/api/v1/ayush/blogs", blogRoutes.router);
-
 app.use("/api/v1/songs", songRoutes.router);
 app.use("/api/v1/notifications", notificationRoutes.router);
 app.use("/api/v1/blogs", blogRoutes.router);
+
+app.use("/api/v1/ayush", staticRoutes);
+app.use("/api/v1/ayush/blogs", blogRoutes.router);
+app.use("/api/v1/ayush/songs", songRoutes.router);
+app.use("/api/v1/ayush/notifications", notificationRoutes.router);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
